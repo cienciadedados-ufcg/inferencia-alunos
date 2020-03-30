@@ -38,11 +38,11 @@ glimpse(dados)
 ```{r}
 dados %>% 
     ggplot(aes(x = sono_semana)) + 
-    geom_histogram(binwidth = 1)
+    geom_histogram(binwidth = 1, boundary = 0)
 
 dados %>% 
     ggplot(aes(x = sono_fds)) + 
-    geom_histogram(binwidth = 1)
+    geom_histogram(binwidth = 1, boundary = 0)
 ```
 
 
@@ -57,13 +57,38 @@ theta_f = function(d, i){
 }
 
 theta_c = theta_f(dados, 1:NROW(dados))
+
+theta_c
 ```
 
 ```{r}
-dados %>% 
+ic = dados %>% 
     boot(statistic = theta_f, R = 4000) %>% 
     tidy(conf.level = 0.95, 
          conf.int = TRUE)
+ic
+```
+
+```{r}
+ic %>%
+    ggplot() +
+    geom_pointrange(aes(
+        x = "",
+        y = statistic,
+        ymin = conf.low,
+        ymax = conf.high
+    )) +
+    geom_jitter(
+        data = dados,
+        mapping = aes(x = "",
+                      y = sono_semana),
+        width = .1,
+        color = "grey",
+        alpha = .5
+    ) +
+    labs(x = "",
+         y = "Média das horas de sono") +
+    coord_flip()
 ```
 
 
@@ -91,10 +116,26 @@ theta_c = theta_f(dados, 1:NROW(dados))
 ```
 
 ```{r}
-dados %>% 
+ic_cor = dados %>% 
     boot(statistic = theta_f, R = 4000) %>% 
     tidy(conf.level = 0.95, 
          conf.int = TRUE)
+ic_cor
+```
+
+```{r}
+ic_cor %>%
+    ggplot() +
+    geom_pointrange(aes(
+        x = "",
+        y = statistic,
+        ymin = conf.low,
+        ymax = conf.high
+    )) +
+    ylim(-1, 1) + 
+    labs(x = "",
+         y = "Correlação") +
+    coord_flip()
 ```
 
 ----
